@@ -54,3 +54,50 @@ my_list[[1]]
 my_list$names
 
 surveys[[3]]
+
+# Factors
+str(surveys)
+surveys$sex <- factor(surveys$sex) # factors are sorted alphabetically by default!
+
+levels(surveys$sex)
+nlevels(surveys$sex)
+
+surveys$sex <- factor(surveys$sex, levels = c("M", "F"))
+levels(surveys$sex)
+
+# Challenge
+surveys$taxa <- factor(surveys$taxa)
+surveys$genus <- factor(surveys$genus)
+
+sum(surveys$taxa == "Rabbit")
+# 75
+#
+nlevels(surveys$genus)
+# 26
+
+# convert factors
+sex <- c("male", "female", "female", "male")
+as.character(sex)
+
+
+years_fct <- factor(c(1990, 1983, 1977, 1997))
+
+as.numeric(years_fct)
+
+as.numeric(as.character(years_fct))
+as.numeric(levels(years_fct))[years_fct]
+
+# Rename factors
+plot(surveys$sex)
+summary(surveys$sex)
+sex <- surveys$sex
+sex <- addNA(sex)
+levels(sex)[3] <- "Missing"
+plot(sex)
+
+levels(sex)[which(levels(sex) == "M")] <- "male"
+levels(sex)[which(levels(sex) == "F")] <- "female"
+plot(sex)
+
+sex <- factor(sex, levels = c("Missing", "female", "male"))
+plot(sex)
