@@ -1,3 +1,6 @@
-*.Rproj*
+*.Rproj
+./.Rproj.user/
 data/
 data_raw/
+.Rproj.user
+.Rhistory
