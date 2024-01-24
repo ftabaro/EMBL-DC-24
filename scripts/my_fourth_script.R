@@ -177,3 +177,26 @@ surveys_long %>%
     names_from = measurement,
     values_from = mean_value
     )
+
+# Exporting data
+
+surveys_complete <- surveys %>%
+  filter(
+    !is.na(weight),
+    !is.na(hindfoot_length),
+    !is.na(sex)
+    )
+
+species_count <- surveys_complete %>%
+  count(species_id) %>%
+  filter(n > 50)
+
+surveys_complete <- surveys_complete %>%
+  filter(
+    species_id %in% species_count$species_id
+    )
+
+write_csv(
+  surveys_complete,
+  file = "data/surveys_complete.csv"
+  )
