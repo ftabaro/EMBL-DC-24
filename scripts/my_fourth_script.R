@@ -96,4 +96,84 @@ surveys %>%
   arrange(year) %>%
   distinct(weight, .keep_all = TRUE)
 
+# Pivoting
+surveys_gw <- surveys %>%
+  filter(!is.na(weight)) %>%
+  group_by(plot_id, genus) %>%
+  summarize(mean_weight = mean(weight))
 
+str(surveys_gw)
+
+surveys_wide <- surveys_gw %>%
+  pivot_wider(
+    id_cols = plot_id,
+    names_from = genus,
+    values_from = mean_weight,
+    values_fill = 0
+  )
+
+surveys_long <- surveys_wide %>%
+  pivot_longer(
+    names_to = "genus",
+    values_to = "mean_weight",
+    cols = -plot_id
+  )
+
+
+# Challenge
+# Reshape the surveys data frame with year as columns, plot_id as rows,
+# and the number of genera per plot as the values.
+# You will need to summarize before reshaping, and use the function n_distinct()
+# to get the number of unique genera within a particular chunk of data.
+# It’s a powerful function! See ?n_distinct for more.
+
+n_genera_w <- surveys %>%
+  group_by(year, plot_id) %>%
+  summarize(ngenera = n_distinct(genus)) %>%
+  pivot_wider(
+    id_cols = plot_id,
+    names_from = year,
+    values_from = ngenera
+  )
+
+# Challenge
+# Now take that data frame and pivot_longer() it, so each row is a unique plot_id by year combination.
+
+n_genera_l <- n_genera_w %>%
+  pivot_longer(
+    names_to = "year",
+    values_to = "ngenera",
+    cols = -plot_id
+  )
+
+# Challenge
+# The surveys data set has two measurement columns: hindfoot_length and weight.
+# This makes it difficult to do things like look at the relationship between
+# mean values of each measurement per year in different plot types.
+# Let’s walk through a common solution for this type of problem. First, use
+# pivot_longer() to create a dataset where we have a names column called
+# measurement and a value column that takes on the value of either
+# hindfoot_length or weight.
+# Hint: You’ll need to specify which columns will be part of the reshape.
+
+surveys_long <- surveys %>%
+  pivot_longer(
+    cols = c(hindfoot_length, weight),
+    names_to = "measurement",
+    values_to = "value"
+  ) %>%
+  select(plot_type, measurement, value, year) %>%
+  drop_na(value)
+
+# With this new data set, calculate the average of each measurement in each year
+# for each different plot_type. Then pivot_wider() them into a data set with a
+# column for hindfoot_length and weight.
+# Hint: You only need to specify the names and values columns for pivot_wider().
+
+surveys_long %>%
+  group_by(year, plot_type, measurement) %>%
+  summarize(mean_value = mean(value)) %>%
+  pivot_wider(
+    names_from = measurement,
+    values_from = mean_value
+    )
